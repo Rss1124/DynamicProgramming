@@ -6,7 +6,8 @@ using namespace std;
 
 long long int Fib(int n, long long int array[]); //斐波那契数列
 long long int gridTraveler(int m,int r,int c,long long int array[]); //gridTraveler m表示二维数组的列数，r、c分别表示当前结点所处的行与列
-bool canSum(int target,int array[],int cS[],int n); //canSum
+bool canAndHowSum(int target,int array[],int cS[],int n); //canSum
+void sum(int *m);
 
 int main() {
 
@@ -24,8 +25,8 @@ int main() {
 //    cout<<gridTraveler(m,r-1,c-1,gTA)<<endl; //m=3,r=2,c=3,n=6
 //    return 0;
 
-/** canSum **/
-    int target,n;
+/** canAndHowSum **/
+    int target,n,m=0;
     cout<<"输入目标值和元素数组的大小:";
     cin>>target>>n;
     int *elem=new int[n];
@@ -36,9 +37,9 @@ int main() {
         cin>>num;
         elem[i]=num;
     }
-//    int elem[4]={5,3,4,7};
-//    int cS[7]={};
-    cout<<canSum(target,elem,cS,n);
+    if(canAndHowSum(target,elem,cS,n)== false){
+        cout<<"null";
+    }
 }
 
 long long int Fib(int n, long long int array[]){
@@ -56,7 +57,7 @@ long long int gridTraveler(int m,int r,int c, long long int array[]){  //m=3,r=1
     return array[r*m+c];
 }
 
-bool canSum(int target,int array[],int cS[],int n){
+bool canAndHowSum(int target,int array[],int cS[],int n){
     if(cS[target]==1) return true;
     if(cS[target]==-1) return false;
     if(target==0) return true;
@@ -66,7 +67,8 @@ bool canSum(int target,int array[],int cS[],int n){
     for(int i=0;i<n;i++){
         int temp;
         temp=target-array[i];
-        if(canSum(temp,array,cS,n)){
+        if(canAndHowSum(temp,array,cS,n)){
+            cout<<array[i];
             cS[target]=1;
             return true;
         }
