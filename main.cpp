@@ -4,6 +4,8 @@
 #include <cstring>
 #include <stdio.h>
 #include <string.h>
+#include <map>
+
 using namespace std;
 
 long long int Fib(int n, long long int array[]); //斐波那契数列
@@ -11,6 +13,7 @@ long long int gridTraveler(int m,int r,int c,long long int array[]); //gridTrave
 int canAndHowSum(int target,int array[],int cS[],int n,int targetArray[],int m,int i,int &min,int tempArray[],int &tag); //canSum，target表示目标值，array[]内的元素用来凑target，cS是用来存储重复信息的仓库，targetArray是组成target的元素集合，m用来记录当前递归的深度
 int Sort(int a[],int low,int high);
 void QuickSort(int a[],int low,int high);
+bool canConstruct(string target,string array[],int length,map<string,bool> &memo);
 
 int main() {
 
@@ -28,30 +31,43 @@ int main() {
 //    cout<<gridTraveler(m,r-1,c-1,gTA)<<endl; //m=3,r=2,c=3,n=6
 //    return 0;
 
-/** canAndHowSum **/
-    int target,n,m=0,i=0,min,tag=0;
-    cout<<"输入目标值和元素数组的大小:";
-    cin>>target>>n;
-    int *elem=new int[n];
-    int *cS=new int[target]();
-    int *targetArray=new int[target]();
-    int *tempArray=new int[target]();
-    for(int i=0;i<n;i++){
-        int num;
-        cout<<"输入数组的第"<<i+1<<"个元素:";
-        cin>>num;
-        elem[i]=num;
-    }
-    QuickSort(elem,0,n-1);
-    min=target;
-    canAndHowSum(target,elem,cS,n,targetArray,m,i,min,tempArray,tag);
-    if(tag==1){
-        for(int i=0;i<min;i++){
-            if(tempArray[i]==0) break;
-            cout<<tempArray[i]<<" ";
-        }
-    }
-    else cout<<"null";
+/** BestSum **/
+//    int target,n,m=0,i=0,min,tag=0;
+//    cout<<"输入目标值和元素数组的大小:";
+//    cin>>target>>n;
+//    int *elem=new int[n];
+//    int *cS=new int[target]();
+//    int *targetArray=new int[target]();
+//    int *tempArray=new int[target]();
+//    for(int i=0;i<n;i++){
+//        int num;
+//        cout<<"输入数组的第"<<i+1<<"个元素:";
+//        cin>>num;
+//        elem[i]=num;
+//    }
+//    QuickSort(elem,0,n-1);
+//    min=target;
+//    canAndHowSum(target,elem,cS,n,targetArray,m,i,min,tempArray,tag);
+//    if(tag==1){
+//        for(int i=0;i<min;i++){
+//            if(tempArray[i]==0) break;
+//            cout<<tempArray[i]<<" ";
+//        }
+//    }
+//    else cout<<"null";
+
+/** canConstruct **/
+//    string target="abcdef";
+//    string array[]={"ab","abc","cd","def","abcd"};
+//    string target="skateboard";
+//    string array[]={"bo","rd","ate","t","ska","sk","boar"};
+//    string target="enterapotentpot";
+//    string array[]={"a","p","ent","enter","ot","o","t"};
+    string target="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef";
+    string array[]={"e","ee","eee","eeee","eeeee","eeeeee"};
+    map<string,bool> memo;
+    int length=sizeof(array)/sizeof(array[0]);
+    cout<<canConstruct(target,array,length,memo);
 }
 
 long long int Fib(int n, long long int array[]){
@@ -113,4 +129,21 @@ void QuickSort(int a[],int low,int high){
         QuickSort(a,low,mid-1);
         QuickSort(a,mid+1,high);
     }
+}
+
+bool canConstruct(string target,string array[],int length,map<string,bool> &memo){
+    map<string,bool> ::iterator find;
+    if(target=="") return true;
+    if((find=memo.find(target))!=memo.end()) return find->second;
+    for(int i=0;i<length;i++){
+        if(target.find(array[i])==0){
+            string str=target.substr(array[i].length());
+            if(canConstruct(str,array,length,memo)==true) {
+                memo.insert(pair<string,bool>(target, true));
+                return true;
+            }
+        }
+    }
+    memo.insert(pair<string,bool>(target,false));
+    return false;
 }
