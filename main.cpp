@@ -8,7 +8,8 @@
 
 using namespace std;
 
-long long int Fib(int n, long long int array[]); //斐波那契数列
+long long int Fib_byTree(int n, long long int array[]); //斐波那契数列
+long long int Fib_byTable(long long int array[],int n);
 long long int gridTraveler(int m,int r,int c,long long int array[]); //gridTraveler m表示二维数组的列数，r、c分别表示当前结点所处的行与列
 int canAndHowSum(int target,int array[],int cS[],int n,int targetArray[],int m,int i,int &min,int tempArray[],int &tag); //canSum，target表示目标值，array[]内的元素用来凑target，cS是用来存储重复信息的仓库，targetArray是组成target的元素集合，m用来记录当前递归的深度
 int Sort(int a[],int low,int high);
@@ -18,9 +19,15 @@ int countConstruct(string target,string array[],int length,map<string,int> &memo
 
 int main() {
 
-/** 斐波那契数列 **/
+/** 斐波那契数列_树型策略 **/
 //    long long int fA[255]={}; //fibArray
 //    cout<<Fib(50,fA)<<endl;
+
+/** 斐波那契数列_表格策略 **/
+    long long int array[255]={};
+    array[1]=1;
+    int n=50;
+    cout<<Fib_byTable(array,n);
 
 /** gridTraveler **/
 //    int r,c,n,m;
@@ -71,17 +78,17 @@ int main() {
 //    cout<<canConstruct(target,array,length,memo);
 
 /** countConstruct **/
-//    string target="purple";
-//    string array[]={"purp","p","ur","le","purpl"};
-//    string target="abcdef";
-//    string array[]={"ab","abc","cd","def","abcd"};
-//    string target="enterapotentpot";
-//    string array[]={"a","p","ent","enter","ot","o","t"};
-    string target="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef";
-    string array[]={"e","ee","eee","eeee","eeeee","eeeeee"};
-    map<string,int> memo;
-    int length=sizeof(array)/sizeof(array[0]);
-    cout<<countConstruct(target,array,length,memo);
+////    string target="purple";
+////    string array[]={"purp","p","ur","le","purpl"};
+////    string target="abcdef";
+////    string array[]={"ab","abc","cd","def","abcd"};
+////    string target="enterapotentpot";
+////    string array[]={"a","p","ent","enter","ot","o","t"};
+//    string target="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef";
+//    string array[]={"e","ee","eee","eeee","eeeee","eeeeee"};
+//    map<string,int> memo;
+//    int length=sizeof(array)/sizeof(array[0]);
+//    cout<<countConstruct(target,array,length,memo);
 
 }
 
@@ -89,6 +96,14 @@ long long int Fib(int n, long long int array[]){
     if(array[n]!=0) return array[n];
     if(n<=2) return 1;
     array[n]=Fib(n-1,array)+Fib(n-2,array);
+    return array[n];
+}
+
+long long int Fib_byTable(long long int array[],int n){
+    for(int i=0;i<=n;i++){
+        array[i+1]+=array[i]; //array[1]=array[1]+array[0] =>1
+        array[i+2]+=array[i]; //array[2]=array[2]+array[0] =>1
+    }
     return array[n];
 }
 
@@ -178,3 +193,4 @@ int countConstruct(string target,string array[],int length,map<string,int> &memo
     memo.insert(pair<string,int>(target, totalNum));
     return totalNum;
 }
+
