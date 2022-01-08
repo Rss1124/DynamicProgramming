@@ -14,6 +14,7 @@ int canAndHowSum(int target,int array[],int cS[],int n,int targetArray[],int m,i
 int Sort(int a[],int low,int high);
 void QuickSort(int a[],int low,int high);
 bool canConstruct(string target,string array[],int length,map<string,bool> &memo);
+int countConstruct(string target,string array[],int length,map<string,int> &memo);
 
 int main() {
 
@@ -63,11 +64,25 @@ int main() {
 //    string array[]={"bo","rd","ate","t","ska","sk","boar"};
 //    string target="enterapotentpot";
 //    string array[]={"a","p","ent","enter","ot","o","t"};
+//    string target="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef";
+//    string array[]={"e","ee","eee","eeee","eeeee","eeeeee"};
+//    map<string,bool> memo;
+//    int length=sizeof(array)/sizeof(array[0]);
+//    cout<<canConstruct(target,array,length,memo);
+
+/** countConstruct **/
+//    string target="purple";
+//    string array[]={"purp","p","ur","le","purpl"};
+//    string target="abcdef";
+//    string array[]={"ab","abc","cd","def","abcd"};
+//    string target="enterapotentpot";
+//    string array[]={"a","p","ent","enter","ot","o","t"};
     string target="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef";
     string array[]={"e","ee","eee","eeee","eeeee","eeeeee"};
-    map<string,bool> memo;
+    map<string,int> memo;
     int length=sizeof(array)/sizeof(array[0]);
-    cout<<canConstruct(target,array,length,memo);
+    cout<<countConstruct(target,array,length,memo);
+
 }
 
 long long int Fib(int n, long long int array[]){
@@ -146,4 +161,20 @@ bool canConstruct(string target,string array[],int length,map<string,bool> &memo
     }
     memo.insert(pair<string,bool>(target,false));
     return false;
+}
+
+int countConstruct(string target,string array[],int length,map<string,int> &memo){
+    map<string,int> ::iterator find;
+    if(target=="") return 1;
+    if((find=memo.find(target))!=memo.end()) return find->second;
+    int totalNum = 0;
+    for(int i=0;i<length;i++){
+        if(target.find(array[i])==0){
+            string str=target.substr(array[i].length());
+            totalNum+=countConstruct(str,array,length,memo);
+            memo.insert(pair<string,int>(target, totalNum));
+        }
+    }
+    memo.insert(pair<string,int>(target, totalNum));
+    return totalNum;
 }
