@@ -8,11 +8,17 @@
 
 using namespace std;
 
+typedef struct Array{
+    int array[255]={};
+    int length=0;
+} Array ;
+
 long long int Fib_byTree(int n, long long int array[]); //斐波那契数列
 long long int Fib_byTable(long long int array[],int n);
 long long int gridTraveler_byTree(int m,int r,int c,long long int array[]); //gridTraveler m表示二维数组的列数，r、c分别表示当前结点所处的行与列
 long long int gridTraveler_byTable(int r,int c,long long int **array); //r、c分别表示当前结点所处的行与列
 int canAndHowSum(int target,int array[],int cS[],int n,int targetArray[],int m,int i,int &min,int tempArray[],int &tag); //canSum，target表示目标值，array[]内的元素用来凑target，cS是用来存储重复信息的仓库，targetArray是组成target的元素集合，m用来记录当前递归的深度
+int bestSum_byTable(Array a[],int elem[],int target,int length);
 int Sort(int a[],int low,int high);
 void QuickSort(int a[],int low,int high);
 bool canConstruct(string target,string array[],int length,map<string,bool> &memo);
@@ -41,18 +47,18 @@ int main() {
 //    return 0;
 
 /** gridTraveler_byTable **/
-    int r,c;
-    long long int **array; //array[r][c]
-    cout<<"请输入二维数组的行列:";
-    cin>>r>>c;
-    array = new long long int*[r];
-    for(int i=0;i<r;i++){
-        array[i]= new long long int[c]{}; //二维数组初始化
-    }
-    array[0][0]=1;
-    cout<<gridTraveler_byTable(r,c,array);
+//    int r,c;
+//    long long int **array; //array[r][c]
+//    cout<<"请输入二维数组的行列:";
+//    cin>>r>>c;
+//    array = new long long int*[r];
+//    for(int i=0;i<r;i++){
+//        array[i]= new long long int[c]{}; //二维数组初始化
+//    }
+//    array[0][0]=1;
+//    cout<<gridTraveler_byTable(r,c,array);
 
-/** BestSum **/
+/** BestSum_byTree **/
 //    int target,n,m=0,i=0,min,tag=0;
 //    cout<<"输入目标值和元素数组的大小:";
 //    cin>>target>>n;
@@ -76,6 +82,13 @@ int main() {
 //        }
 //    }
 //    else cout<<"null";
+
+/** BestSum_byTable **/
+    Array a[255]={};
+    int elem[4]={1,2,5,25};
+    int target=100;
+    int lengthArray=sizeof(elem)/sizeof(elem[0]);
+    bestSum_byTable(a,elem,target,lengthArray);
 
 /** canConstruct **/
 //    string target="abcdef";
@@ -166,23 +179,43 @@ int canAndHowSum(int target,int array[],int cS[],int n,int targetArray[],int m,i
     return 0;
 }
 
-int Sort(int a[],int low,int high){
-    int pivot=a[low]; //第一个元素为数轴
-    while (low<high){
-        while(low<high&&a[high]>=pivot) --high;
-        a[low]=a[high];
-        while(low<high&&a[low]<=pivot) ++low;
-        a[high]=a[low];
+int bestSum_byTable(Array a[],int elem[],int target,int length){
+    for(int i=0;i<target+1;i++){
+        if(i==0){
+            for(int j=0;j<length;j++){
+                a[i+elem[j]].array[a[i+elem[j]].length]=elem[j];
+                a[i+elem[j]].length++;
+            }
+        }
+        else{
+            if(a[i].length!=0){
+                for(int j=0;j<length;j++){
+                    if(i+elem[j]<target+1){
+                        /** 比较长度 **/
+                        if(a[i].length+1<=a[i+elem[j]].length&&a[i+elem[j]].length!=0){
+                            a[i+elem[j]].length=a[i].length;
+                            for(int k=0;k<a[i].length;k++){
+                                a[i+elem[j]].array[k]=a[i].array[k];
+                            }
+                            a[i+elem[j]].array[a[i+elem[j]].length]=elem[j];
+                            a[i+elem[j]].length++;
+                        }
+                        else if(a[i].length>=a[i+elem[j]].length+1&&a[i+elem[j]].length!=0);
+                        else{
+                            a[i+elem[j]].length=a[i].length;
+                            for(int k=0;k<a[i].length;k++){
+                                a[i+elem[j]].array[k]=a[i].array[k];
+                            }
+                            a[i+elem[j]].array[a[i+elem[j]].length]=elem[j];
+                            a[i+elem[j]].length++;
+                        }
+                    }
+                }
+            }
+        }
     }
-    a[low]=pivot;
-    return low;
-}
-
-void QuickSort(int a[],int low,int high){
-    if(low<high){
-        int mid=Sort(a,low,high);
-        QuickSort(a,low,mid-1);
-        QuickSort(a,mid+1,high);
+    for(int k=0;k<=a[target].length-1;k++){
+        cout<<a[target].array[k]<<" ";
     }
 }
 
@@ -219,3 +252,22 @@ int countConstruct(string target,string array[],int length,map<string,int> &memo
     return totalNum;
 }
 
+int Sort(int a[],int low,int high){
+    int pivot=a[low]; //第一个元素为数轴
+    while (low<high){
+        while(low<high&&a[high]>=pivot) --high;
+        a[low]=a[high];
+        while(low<high&&a[low]<=pivot) ++low;
+        a[high]=a[low];
+    }
+    a[low]=pivot;
+    return low;
+}
+
+void QuickSort(int a[],int low,int high){
+    if(low<high){
+        int mid=Sort(a,low,high);
+        QuickSort(a,low,mid-1);
+        QuickSort(a,mid+1,high);
+    }
+}
