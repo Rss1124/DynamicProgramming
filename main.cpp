@@ -13,16 +13,32 @@ typedef struct Array{
     int length=0;
 } Array ;
 
+/** 嵌套结构体arrayMap **/
+
+typedef struct Str{
+    string str[100];
+    int length=0;
+}Str;
+typedef struct arrayStr{
+    struct Str array[100];
+    int length=0;
+}arrayStr;
+typedef struct arrayMap{
+    struct arrayStr aS;
+}arrayMap;
+
+int Sort(int a[],int low,int high);
+void QuickSort(int a[],int low,int high);
 long long int Fib_byTree(int n, long long int array[]); //斐波那契数列
 long long int Fib_byTable(long long int array[],int n);
 long long int gridTraveler_byTree(int m,int r,int c,long long int array[]); //gridTraveler m表示二维数组的列数，r、c分别表示当前结点所处的行与列
 long long int gridTraveler_byTable(int r,int c,long long int **array); //r、c分别表示当前结点所处的行与列
 int canAndHowSum(int target,int array[],int cS[],int n,int targetArray[],int m,int i,int &min,int tempArray[],int &tag); //canSum，target表示目标值，array[]内的元素用来凑target，cS是用来存储重复信息的仓库，targetArray是组成target的元素集合，m用来记录当前递归的深度
 int bestSum_byTable(Array a[],int elem[],int target,int length);
-int Sort(int a[],int low,int high);
-void QuickSort(int a[],int low,int high);
 bool canConstruct(string target,string array[],int length,map<string,bool> &memo);
 int countConstruct(string target,string array[],int length,map<string,int> &memo);
+void allConstruct(string target,string elem[],map<string,arrayMap> &m,int length);
+
 
 int main() {
 
@@ -58,7 +74,7 @@ int main() {
 //    array[0][0]=1;
 //    cout<<gridTraveler_byTable(r,c,array);
 
-/** BestSum_byTree **/
+/** BestSum_byTree(递归实现有问题） **/
 //    int target,n,m=0,i=0,min,tag=0;
 //    cout<<"输入目标值和元素数组的大小:";
 //    cin>>target>>n;
@@ -84,11 +100,11 @@ int main() {
 //    else cout<<"null";
 
 /** BestSum_byTable **/
-    Array a[255]={};
-    int elem[4]={1,2,5,25};
-    int target=100;
-    int lengthArray=sizeof(elem)/sizeof(elem[0]);
-    bestSum_byTable(a,elem,target,lengthArray);
+//    Array a[255]={};
+//    int elem[4]={1,2,5,25};
+//    int target=100;
+//    int lengthArray=sizeof(elem)/sizeof(elem[0]);
+//    bestSum_byTable(a,elem,target,lengthArray);
 
 /** canConstruct **/
 //    string target="abcdef";
@@ -115,6 +131,26 @@ int main() {
 //    map<string,int> memo;
 //    int length=sizeof(array)/sizeof(array[0]);
 //    cout<<countConstruct(target,array,length,memo);
+
+/** allConstruct_byTable **/
+    string target="abcdef";
+    string elem[]={"ab","abc","cd","def","abcd","ef","c"};
+//    string target="purple";
+//    string elem[]={"purp","p","ur","le","purpl"};
+//    string target="skateboard";
+//    string elem[]={"bo","rd","ate","t","ska","boar"};
+    int length=sizeof(elem)/sizeof(elem[0]);
+    string str="";
+    arrayMap a;
+    map<string,arrayMap> m;
+    for(int i=0;i<target.length()+1;i++){
+        if(i==0) m.insert(pair<string,arrayMap>("[]",a));
+        else{
+            str=str+target[i-1];
+            m.insert(pair<string,arrayMap>(str,a));
+        }
+    }
+    allConstruct(target,elem,m,length);
 
 }
 
@@ -250,6 +286,70 @@ int countConstruct(string target,string array[],int length,map<string,int> &memo
     }
     memo.insert(pair<string,int>(target, totalNum));
     return totalNum;
+}
+
+void allConstruct(string target,string elem[],map<string,arrayMap> &m,int length){
+//    length; //7
+//    target.length()+1; //7
+    map<string,arrayMap> ::iterator it;
+    map<string,arrayMap> ::iterator itEnd;
+    map<string,arrayMap> ::iterator find;
+    it=m.begin();
+    itEnd=m.end();
+    int i=0;
+    while(it!=itEnd){
+        if(i==0){
+            for(int j=0;j<length;j++){
+                map<string,arrayMap> ::iterator find;
+                if(target.find(elem[j])==0){ //elem[j]=ab,abc,abcd
+                    if((find=m.find(elem[j]))!=m.end()){
+                        find->second.aS.array[find->second.aS.length].str[find->second.aS.array[find->second.aS.length].length]=elem[j];
+                        find->second.aS.array[find->second.aS.length].length++; //内部数组长度+1
+                        find->second.aS.length++; //外部数组长度+1 注意：必须先内部再外部
+                    }
+                }
+            }
+        }
+        else{
+            if(it->second.aS.length!=0){
+                string str=target.substr(it->first.length());
+                for(int j=0;j<length;j++){
+                    map<string,arrayMap> ::iterator find;
+                    if(str.find(elem[j])==0){
+                        string new_str=it->first+elem[j];
+                        if((find=m.find(new_str))!=m.end()){
+                            int len0=it->second.aS.length;
+                            for(int p=0;p<len0;p++){
+                                int l=it->second.aS.array[p].length;
+                                for(int q=0;q<l;q++){
+                                    find->second.aS.array[find->second.aS.length].str[q]=it->second.aS.array[p].str[q];
+                                }
+                                find->second.aS.array[find->second.aS.length].str[l]=elem[j];
+                                find->second.aS.array[find->second.aS.length++].length=l+1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        it++;
+        i++;
+    }
+    if((find=m.find(target))!=m.end()){
+        int len1=find->second.aS.length; //len1=4
+        if(len1!=0){
+            for(int i=0;i<len1;i++){
+                cout<<"[";
+                int len2=find->second.aS.array[i].length;
+                for(int j=0;j<len2;j++){
+                    cout<<find->second.aS.array[i].str[j];
+                    if(j+1<len2) cout<<" ";
+                }
+                cout<<"]"<<endl;
+            }
+        }
+        else cout<<"[]";
+    }
 }
 
 int Sort(int a[],int low,int high){
